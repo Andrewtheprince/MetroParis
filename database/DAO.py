@@ -1,8 +1,22 @@
 from database.DB_connect import DBConnect
+from model.connessione import Connessione
 from model.fermata import Fermata
 
 
-class DAO():
+def getAllEdges():
+    conn = DBConnect.get_connection()
+    result = []
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT * FROM connessione c"
+    cursor.execute(query)
+    for row in cursor:
+        result.append(Connessione(**row))
+    cursor.close()
+    conn.close()
+    return result
+
+
+class DAO:
 
     @staticmethod
     def getAllFermate():
@@ -19,6 +33,4 @@ class DAO():
         cursor.close()
         conn.close()
         return result
-
-
 
