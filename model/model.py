@@ -11,3 +11,4 @@ class Model:
     @property
     def fermate(self):
         return self._fermate
+

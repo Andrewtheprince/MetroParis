@@ -16,3 +16,5 @@ class Fermata:
 
     def __eq__(self, other):
         return self.id_fermata == other.id_fermata
+
+

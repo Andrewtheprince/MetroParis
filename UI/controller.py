@@ -9,9 +9,11 @@ class Controller:
         self._model = model
 
     def handleCreaGrafo(self,e):
+
         pass
 
     def handleCercaRaggiungibili(self,e):
+
         pass
 
     def loadFermate(self, dd: ft.Dropdown()):
