@@ -13,8 +13,9 @@ class Model:
         self._grafo.add_nodes_from(self._fermate)
         allEdges = getAllEdges()
         for edge in allEdges:
-            u = self._idMapFermate
-            v = self._idMapFermate
+            u = self._idMapFermate[edge.id_stazP]
+            v = self._idMapFermate[edge.id_stazA]
+
 
 
     @property
