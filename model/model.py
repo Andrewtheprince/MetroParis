@@ -2,6 +2,7 @@ from datetime import datetime
 
 from database.DAO import DAO
 import networkx as nx
+import geopy.distance
 
 
 class Model:
@@ -12,6 +13,10 @@ class Model:
         for f in self._fermate:
             self._idMapFermate[f.id_fermata] = f
 
+    def getShortestPath(self, u, v):
+        return nx.single_source_dijkstra(self._grafo, u, v)
+
+    @property
     def getBFSNodesFromTree(self, source):
         tree = nx.bfs_tree(self._grafo, source)
         archi = list(tree.edges())
@@ -40,7 +45,18 @@ class Model:
     def buildGraphPesato(self):
         self._grafo.clear()
         self._grafo.add_nodes_from(self._fermate)
-        self.addEdgesPesatiV2()
+        self.addEdgesPesatiTempi()
+
+    def addEdgesPesatiTempi(self):
+        """Aggiunge archi con peso uguale
+        al tempo di percorrenza dell'arco"""
+        self._grafo.clear_edges()
+        allEdges = DAO.getAllEdgesVel()
+        for e in allEdges:
+            u = self._idMapFermate[e[0]]
+            v = self._idMapFermate[e[1]]
+            peso = getTraversalTime(u, v, e[2])
+            self._grafo.add_edge(u, v, weight=peso)
 
     def addEdgesPesati(self):
         self._grafo.clear_edges()
@@ -62,15 +78,17 @@ class Model:
             self._grafo.add_edge(
                 self._idMapFermate[e[0]],
                 self._idMapFermate[e[1]],
-                weight = e[2]
+                weight=e[2]
             )
+
     def getArchiPesoMaggiore(self):
         edges = self._grafo.edges(data=True)
         res = []
         for e in edges:
-            if self._grafo.get_edge_data(e[0],e[1])["weight"]>1:
+            if self._grafo.get_edge_data(e[0], e[1])["weight"] > 1:
                 res.append(e)
-        return(res)
+        return (res)
+
     def buildGraph(self):
         # Aggiungiamo i nodi
         self._grafo.add_nodes_from(self._fermate)
@@ -133,3 +151,10 @@ class Model:
     @property
     def fermate(self):
         return self._fermate
+
+
+def getTraversalTime(u, v, vel):
+    dist = geopy.distance.distance((u.coordX, u.coordY),
+                                   (v.coordX, v.coordY)).km  # in km
+    time = dist / vel * 60  # in minuti
+    return time
